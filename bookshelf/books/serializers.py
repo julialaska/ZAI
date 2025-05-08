@@ -58,14 +58,23 @@ class BookSerializer(serializers.ModelSerializer):
             'description',
             'price',
             'publication_date',
+            'book_format',
+            'cover_image',
             'details'
         ]
 
     def create(self, validated_data):
+        categories_data = validated_data.pop('categories', None)
         details_data = validated_data.pop('details', None)
+
         book = Book.objects.create(**validated_data)
+
+        if categories_data is not None:
+            book.categories.set(categories_data)
+
         if details_data:
             BookDetails.objects.create(book=book, **details_data)
+
         return book
 
     def update(self, instance, validated_data):
