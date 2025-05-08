@@ -66,3 +66,22 @@ class Book(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['title', 'author'], name='unique_author_title')
         ]
+
+
+class BookDetails(models.Model):
+    book = models.OneToOneField(
+        Book,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        related_name='details'
+    )
+    isbn = models.CharField(max_length=20, unique=True, blank=True, null=True, verbose_name="ISBN")
+    number_of_pages = models.PositiveIntegerField(blank=True, null=True, verbose_name="Liczba stron")
+    language = models.CharField(max_length=50, blank=True, verbose_name="Język")
+    publisher = models.CharField(max_length=100, blank=True, verbose_name="Wydawca")
+
+    def __str__(self):
+        return f"Szczegóły dla: {self.book.title}"
+
+    class Meta:
+        verbose_name_plural = "Szczegóły książek"

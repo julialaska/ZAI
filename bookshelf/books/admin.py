@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Author, Category, Book
+from .models import Author, Category, Book, BookDetails
+
+
+class BookDetailsInline(admin.StackedInline):
+    model = BookDetails
+    can_delete = False
+    verbose_name_plural = 'Szczegóły książki'
 
 
 @admin.register(Author)
@@ -22,6 +28,15 @@ class BookAdmin(admin.ModelAdmin):
     date_hierarchy = 'publication_date'
     filter_horizontal = ('categories',)
 
+    inlines = [BookDetailsInline]
+
     def display_categories(self, obj):
         return ", ".join([category.name for category in obj.categories.all()])
     display_categories.short_description = 'Categories'
+
+    def has_details(self, obj):
+        try:
+            return bool(obj.details and obj.details.pk is not None)
+        except BookDetails.DoesNotExist:
+            return False
+    has_details.boolean = True
